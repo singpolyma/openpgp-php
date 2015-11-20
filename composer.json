@@ -1,5 +1,5 @@
 {
-  "name": "singpolyma/openpgp-php",
+  "name": "sivig/openpgp-php",
   "description": "Pure-PHP implementation of the OpenPGP Message Format (RFC 4880)",
   "license": "Unlicense",
   "authors": [
