@@ -170,7 +170,7 @@ class OpenPGP_Crypt_Symmetric {
         break;
     }
     if(!$cipher) return array(NULL, NULL, NULL); // Unsupported cipher
-    if(!isset($key_bytes)) $key_bytes = $cipher->key_size;
+    if(!isset($key_bytes)) $key_bytes = $cipher->key_length;
     if(!isset($key_block_bytes)) $key_block_bytes = $cipher->block_size;
     return array($cipher, $key_bytes, $key_block_bytes);
   }
