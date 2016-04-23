@@ -154,7 +154,7 @@ class OpenPGP_Crypt_RSA {
     if(!$sig) {
       $sig = new OpenPGP_SignaturePacket($packet, 'RSA', strtoupper($hash)); 
       $sig->signature_type = 0x13;
-      $sig->hashed_subpackets[] = new OpenPGP_SignaturePacket_KeyFlagsPacket(array(0x01, 0x02));
+      $sig->hashed_subpackets[] = new OpenPGP_SignaturePacket_KeyFlagsPacket(array(0x03));
       $sig->hashed_subpackets[] = new OpenPGP_SignaturePacket_IssuerPacket($keyid);
       $packet[] = $sig;
     }
