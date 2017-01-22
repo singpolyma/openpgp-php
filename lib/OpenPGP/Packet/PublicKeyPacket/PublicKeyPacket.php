@@ -13,15 +13,21 @@ use OpenPGP\Packet\Packet;
  * @see http://tools.ietf.org/html/rfc4880#section-11.1
  * @see http://tools.ietf.org/html/rfc4880#section-12
  */
-class PublicKeyPacket extends Packet {
-    public $version, $timestamp, $algorithm;
-    public $key, $key_id, $fingerprint;
+class PublicKeyPacket extends Packet
+{
+    public $version;
+    public $timestamp;
+    public $algorithm;
+    public $key;
+    public $key_id;
+    public $fingerprint;
     public $v3_days_of_validity;
 
-    function __construct($key=array(), $algorithm='RSA', $timestamp=NULL, $version=4) {
+    public function __construct($key=array(), $algorithm='RSA', $timestamp=null, $version=4)
+    {
         parent::__construct();
 
-        if($key instanceof PublicKeyPacket) {
+        if ($key instanceof PublicKeyPacket) {
             $this->algorithm = $key->algorithm;
             $this->key = array();
 
@@ -37,55 +43,60 @@ class PublicKeyPacket extends Packet {
             $this->v3_days_of_validity = $key->v3_days_of_validity;
         } else {
             $this->key = $key;
-            if(is_string($this->algorithm = $algorithm)) {
+            if (is_string($this->algorithm = $algorithm)) {
                 $this->algorithm = array_search($this->algorithm, self::$algorithms);
             }
             $this->timestamp = $timestamp ? $timestamp : time();
             $this->version = $version;
 
-            if(count($this->key) > 0) {
+            if (count($this->key) > 0) {
                 $this->key_id = substr($this->fingerprint(), -8);
             }
         }
     }
 
     // Find self signatures in a message, these often contain metadata about the key
-    function self_signatures($message) {
+    public function self_signatures($message)
+    {
         $sigs = array();
         $keyid16 = strtoupper(substr($this->fingerprint, -16));
-        foreach($message as $p) {
-            if($p instanceof SignaturePacket) {
-                if(strtoupper($p->issuer()) == $keyid16) {
+        foreach ($message as $p) {
+            if ($p instanceof SignaturePacket) {
+                if (strtoupper($p->issuer()) == $keyid16) {
                     $sigs[] = $p;
                 } else {
-                    foreach(array_merge($p->hashed_subpackets, $p->unhashed_subpackets) as $s) {
-                        if($s instanceof OpenPGP_SignaturePacket_EmbeddedSignaturePacket && strtoupper($s->issuer()) == $keyid16) {
+                    foreach (array_merge($p->hashed_subpackets, $p->unhashed_subpackets) as $s) {
+                        if ($s instanceof OpenPGP_SignaturePacket_EmbeddedSignaturePacket && strtoupper($s->issuer()) == $keyid16) {
                             $sigs[] = $p;
                             break;
                         }
                     }
                 }
-            } else if(count($sigs)) break; // After we've seen a self sig, the next non-sig stop all self-sigs
+            } elseif (count($sigs)) {
+                break;
+            } // After we've seen a self sig, the next non-sig stop all self-sigs
         }
         return $sigs;
     }
 
     // Find expiry time of this key based on the self signatures in a message
-    function expires($message) {
-        foreach($this->self_signatures($message) as $p) {
-            foreach(array_merge($p->hashed_subpackets, $p->unhashed_subpackets) as $s) {
-                if($s instanceof OpenPGP_SignaturePacket_KeyExpirationTimePacket) {
+    public function expires($message)
+    {
+        foreach ($this->self_signatures($message) as $p) {
+            foreach (array_merge($p->hashed_subpackets, $p->unhashed_subpackets) as $s) {
+                if ($s instanceof OpenPGP_SignaturePacket_KeyExpirationTimePacket) {
                     return $this->timestamp + $s->data;
                 }
             }
         }
-        return NULL; // Never expires
+        return null; // Never expires
     }
 
     /**
      * @see http://tools.ietf.org/html/rfc4880#section-5.5.2
      */
-    function read() {
+    public function read()
+    {
         switch ($this->version = ord($this->read_byte())) {
             case 3:
                 $this->timestamp = $this->read_timestamp();
@@ -103,14 +114,16 @@ class PublicKeyPacket extends Packet {
     /**
      * @see http://tools.ietf.org/html/rfc4880#section-5.5.2
      */
-    function read_key_material() {
+    public function read_key_material()
+    {
         foreach (self::$key_fields[$this->algorithm] as $field) {
             $this->key[$field] = $this->read_mpi();
         }
         $this->key_id = substr($this->fingerprint(), -8);
     }
 
-    function fingerprint_material() {
+    public function fingerprint_material()
+    {
         switch ($this->version) {
             case 3:
                 $material = array();
@@ -121,7 +134,7 @@ class PublicKeyPacket extends Packet {
                 return $material;
             case 4:
                 $head = array(
-                    chr(0x99), NULL,
+                    chr(0x99), null,
                     chr($this->version), pack('N', $this->timestamp),
                     chr($this->algorithm),
                 );
@@ -141,7 +154,8 @@ class PublicKeyPacket extends Packet {
      * @see http://tools.ietf.org/html/rfc4880#section-12.2
      * @see http://tools.ietf.org/html/rfc4880#section-3.3
      */
-    function fingerprint() {
+    public function fingerprint()
+    {
         switch ($this->version) {
             case 2:
             case 3:
@@ -151,7 +165,8 @@ class PublicKeyPacket extends Packet {
         }
     }
 
-    function body() {
+    public function body()
+    {
         switch ($this->version) {
             case 2:
             case 3:
@@ -165,13 +180,13 @@ class PublicKeyPacket extends Packet {
         }
     }
 
-    static $key_fields = array(
+    public static $key_fields = array(
         1 => array('n', 'e'),           // RSA
         16 => array('p', 'g', 'y'),      // ELG-E
         17 => array('p', 'q', 'g', 'y'), // DSA
     );
 
-    static $algorithms = array(
+    public static $algorithms = array(
         1 => 'RSA',
         2 => 'RSA',
         3 => 'RSA',
@@ -181,5 +196,4 @@ class PublicKeyPacket extends Packet {
         19 => 'ECDSA',
         21 => 'DH'
     );
-
 }

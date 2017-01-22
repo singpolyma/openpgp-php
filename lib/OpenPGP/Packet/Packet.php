@@ -8,10 +8,16 @@ namespace OpenPGP\Packet;
  * @see http://tools.ietf.org/html/rfc4880#section-4.1
  * @see http://tools.ietf.org/html/rfc4880#section-4.3
  */
-class Packet {
-    public $tag, $size, $data, $input, $length;
+class Packet
+{
+    public $tag;
+    public $size;
+    public $data;
+    public $input;
+    public $length;
 
-    static function class_for($tag) {
+    public static function class_for($tag)
+    {
         return isset(self::$tags[$tag]) && class_exists(
             $class = 'OpenPGP_' . self::$tags[$tag] . 'Packet') ? $class : __CLASS__;
     }
@@ -23,8 +29,9 @@ class Packet {
      *
      * @see http://tools.ietf.org/html/rfc4880#section-4.2
      */
-    static function parse(&$input) {
-        $packet = NULL;
+    public static function parse(&$input)
+    {
+        $packet = null;
         if (strlen($input) > 0) {
             $parser = ord($input[0]) & 64 ? 'parse_new_format' : 'parse_old_format';
 
@@ -64,16 +71,17 @@ class Packet {
      *
      * @see http://tools.ietf.org/html/rfc4880#section-4.2.2
      */
-    static function parse_new_format($input, $header_start = 0) {
+    public static function parse_new_format($input, $header_start = 0)
+    {
         $tag = ord($input[0]) & 63;
         $len = ord($input[$header_start + 1]);
-        if($len < 192) { // One octet length
+        if ($len < 192) { // One octet length
             return array($tag, 2, $len, false);
         }
-        if($len > 191 && $len < 224) { // Two octet length
+        if ($len > 191 && $len < 224) { // Two octet length
             return array($tag, 3, (($len - 192) << 8) + ord($input[$header_start + 2]) + 192, false);
         }
-        if($len == 255) { // Five octet length
+        if ($len == 255) { // Five octet length
             $unpacked = unpack('N', substr($input, $header_start + 2, 4));
             return array($tag, 6, reset($unpacked), false);
         }
@@ -86,7 +94,8 @@ class Packet {
      *
      * @see http://tools.ietf.org/html/rfc4880#section-4.2.1
      */
-    static function parse_old_format($input) {
+    public static function parse_old_format($input)
+    {
         $len = ($tag = ord($input[0])) & 3;
         $tag = ($tag >> 2) & 15;
         switch ($len) {
@@ -112,26 +121,31 @@ class Packet {
         return array($tag, $head_length, $data_length, false);
     }
 
-    function __construct($data=NULL) {
+    public function __construct($data=null)
+    {
         $this->tag = array_search(substr(substr(get_class($this), 8), 0, -6), self::$tags);
         $this->data = $data;
     }
 
-    function read() {
+    public function read()
+    {
     }
 
-    function body() {
+    public function body()
+    {
         return $this->data; // Will normally be overridden by subclasses
     }
 
-    function header_and_body() {
+    public function header_and_body()
+    {
         $body = $this->body(); // Get body first, we will need it's length
         $tag = chr($this->tag | 0xC0); // First two bits are 1 for new packet format
         $size = chr(255).pack('N', strlen($body)); // Use 5-octet lengths
         return array('header' => $tag.$size, 'body' => $body);
     }
 
-    function to_bytes() {
+    public function to_bytes()
+    {
         $data = $this->header_and_body();
         return $data['header'].$data['body'];
     }
@@ -139,14 +153,16 @@ class Packet {
     /**
      * @see http://tools.ietf.org/html/rfc4880#section-3.5
      */
-    function read_timestamp() {
+    public function read_timestamp()
+    {
         return $this->read_unpacked(4, 'N');
     }
 
     /**
      * @see http://tools.ietf.org/html/rfc4880#section-3.2
      */
-    function read_mpi() {
+    public function read_mpi()
+    {
         $length = $this->read_unpacked(2, 'n');  // length in bits
         $length = (int)floor(($length + 7) / 8); // length in bytes
         return $this->read_bytes($length);
@@ -155,22 +171,25 @@ class Packet {
     /**
      * @see http://php.net/manual/en/function.unpack.php
      */
-    function read_unpacked($count, $format) {
+    public function read_unpacked($count, $format)
+    {
         $unpacked = unpack($format, $this->read_bytes($count));
         return reset($unpacked);
     }
 
-    function read_byte() {
-        return ($bytes = $this->read_bytes()) ? $bytes[0] : NULL;
+    public function read_byte()
+    {
+        return ($bytes = $this->read_bytes()) ? $bytes[0] : null;
     }
 
-    function read_bytes($count = 1) {
+    public function read_bytes($count = 1)
+    {
         $bytes = substr($this->input, 0, $count);
         $this->input = substr($this->input, $count);
         return $bytes;
     }
 
-    static $tags = array(
+    public static $tags = array(
         1 => 'AsymmetricSessionKey',      // Public-Key Encrypted Session Key
         2 => 'Signature',                 // Signature Packet
         3 => 'SymmetricSessionKey',       // Symmetric-Key Encrypted Session Key Packet

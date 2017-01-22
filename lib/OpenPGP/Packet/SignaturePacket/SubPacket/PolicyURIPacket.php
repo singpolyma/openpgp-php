@@ -4,11 +4,13 @@ namespace OpenPGP\Packet\SignaturePacket\SubPacket;
 
 class PolicyURIPacket extends Subpacket
 {
-    function read() {
+    public function read()
+    {
         $this->data = $this->input;
     }
 
-    function body() {
+    public function body()
+    {
         return $this->data;
     }
 }

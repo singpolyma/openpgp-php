@@ -9,5 +9,4 @@ namespace OpenPGP\Packet;
  */
 class ExperimentalPacket extends Packet
 {
-
 }

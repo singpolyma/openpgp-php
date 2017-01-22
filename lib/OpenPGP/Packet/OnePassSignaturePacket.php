@@ -9,21 +9,28 @@ namespace OpenPGP\Packet;
  */
 class OnePassSignaturePacket extends Packet
 {
-    public $version, $signature_type, $hash_algorithm, $key_algorithm, $key_id, $nested;
-    function read() {
+    public $version;
+    public $signature_type;
+    public $hash_algorithm;
+    public $key_algorithm;
+    public $key_id;
+    public $nested;
+    public function read()
+    {
         $this->version = ord($this->read_byte());
         $this->signature_type = ord($this->read_byte());
         $this->hash_algorithm = ord($this->read_byte());
         $this->key_algorithm = ord($this->read_byte());
-        for($i = 0; $i < 8; $i++) { // Store KeyID in Hex
-            $this->key_id .= sprintf('%02X',ord($this->read_byte()));
+        for ($i = 0; $i < 8; $i++) { // Store KeyID in Hex
+            $this->key_id .= sprintf('%02X', ord($this->read_byte()));
         }
         $this->nested = ord($this->read_byte());
     }
 
-    function body() {
+    public function body()
+    {
         $body = chr($this->version).chr($this->signature_type).chr($this->hash_algorithm).chr($this->key_algorithm);
-        for($i = 0; $i < strlen($this->key_id); $i += 2) {
+        for ($i = 0; $i < strlen($this->key_id); $i += 2) {
             $body .= chr(hexdec($this->key_id{$i}.$this->key_id{$i+1}));
         }
         $body .= chr((int)$this->nested);

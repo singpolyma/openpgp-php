@@ -8,12 +8,16 @@ namespace OpenPGP\Packet;
  * @see http://tools.ietf.org/html/rfc4880#section-5.11
  * @see http://tools.ietf.org/html/rfc2822
  */
-class UserIDPacket extends Packet {
-    public $name, $comment, $email;
+class UserIDPacket extends Packet
+{
+    public $name;
+    public $comment;
+    public $email;
 
-    function __construct($name='', $comment='', $email='') {
+    public function __construct($name='', $comment='', $email='')
+    {
         parent::__construct();
-        if(!$comment && !$email) {
+        if (!$comment && !$email) {
             $this->input = $name;
             $this->read();
         } else {
@@ -23,7 +27,8 @@ class UserIDPacket extends Packet {
         }
     }
 
-    function read() {
+    public function read()
+    {
         $this->data = $this->input;
         // User IDs of the form: "name (comment) <email>"
         if (preg_match('/^([^\(]+)\(([^\)]+)\)\s+<([^>]+)>$/', $this->data, $matches)) {
@@ -32,34 +37,42 @@ class UserIDPacket extends Packet {
             $this->email   = trim($matches[3]);
         }
         // User IDs of the form: "name <email>"
-        else if (preg_match('/^([^<]+)\s+<([^>]+)>$/', $this->data, $matches)) {
+        elseif (preg_match('/^([^<]+)\s+<([^>]+)>$/', $this->data, $matches)) {
             $this->name    = trim($matches[1]);
-            $this->comment = NULL;
+            $this->comment = null;
             $this->email   = trim($matches[2]);
         }
         // User IDs of the form: "name"
-        else if (preg_match('/^([^<]+)$/', $this->data, $matches)) {
+        elseif (preg_match('/^([^<]+)$/', $this->data, $matches)) {
             $this->name    = trim($matches[1]);
-            $this->comment = NULL;
-            $this->email   = NULL;
+            $this->comment = null;
+            $this->email   = null;
         }
         // User IDs of the form: "<email>"
-        else if (preg_match('/^<([^>]+)>$/', $this->data, $matches)) {
-            $this->name    = NULL;
-            $this->comment = NULL;
+        elseif (preg_match('/^<([^>]+)>$/', $this->data, $matches)) {
+            $this->name    = null;
+            $this->comment = null;
             $this->email   = trim($matches[2]);
         }
     }
 
-    function __toString() {
+    public function __toString()
+    {
         $text = array();
-        if ($this->name)    { $text[] = $this->name; }
-        if ($this->comment) { $text[] = "({$this->comment})"; }
-        if ($this->email)   { $text[] = "<{$this->email}>"; }
+        if ($this->name) {
+            $text[] = $this->name;
+        }
+        if ($this->comment) {
+            $text[] = "({$this->comment})";
+        }
+        if ($this->email) {
+            $text[] = "<{$this->email}>";
+        }
         return implode(' ', $text);
     }
 
-    function body() {
+    public function body()
+    {
         return ''.$this; // Convert to string is the body
     }
 }

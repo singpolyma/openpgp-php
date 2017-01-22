@@ -9,11 +9,13 @@ namespace OpenPGP\Packet;
  */
 class TrustPacket extends Packet
 {
-    public function read() {
+    public function read()
+    {
         $this->data = $this->input;
     }
 
-    public function body() {
+    public function body()
+    {
         return $this->data;
     }
 }

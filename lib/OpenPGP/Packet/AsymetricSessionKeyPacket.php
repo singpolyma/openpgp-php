@@ -9,9 +9,13 @@ namespace OpenPGP\Packet;
  */
 class AsymmetricSessionKeyPacket extends Packet
 {
-    public $version, $keyid, $key_algorithm, $encrypted_data;
+    public $version;
+    public $keyid;
+    public $key_algorithm;
+    public $encrypted_data;
 
-    function __construct($key_algorithm='', $keyid='', $encrypted_data='', $version=3) {
+    public function __construct($key_algorithm='', $keyid='', $encrypted_data='', $version=3)
+    {
         parent::__construct();
         $this->version = $version;
         $this->keyid = substr($keyid, -16);
@@ -19,13 +23,14 @@ class AsymmetricSessionKeyPacket extends Packet
         $this->encrypted_data = $encrypted_data;
     }
 
-    function read() {
-        switch($this->version = ord($this->read_byte())) {
+    public function read()
+    {
+        switch ($this->version = ord($this->read_byte())) {
             case 3:
                 $rawkeyid = $this->read_bytes(8);
                 $this->keyid = '';
-                for($i = 0; $i < strlen($rawkeyid); $i++) { // Store KeyID in Hex
-                    $this->keyid .= sprintf('%02X',ord($rawkeyid{$i}));
+                for ($i = 0; $i < strlen($rawkeyid); $i++) { // Store KeyID in Hex
+                    $this->keyid .= sprintf('%02X', ord($rawkeyid{$i}));
                 }
 
                 $this->key_algorithm = ord($this->read_byte());
@@ -37,10 +42,11 @@ class AsymmetricSessionKeyPacket extends Packet
         }
     }
 
-    function body() {
+    public function body()
+    {
         $bytes = chr($this->version);
 
-        for($i = 0; $i < strlen($this->keyid); $i += 2) {
+        for ($i = 0; $i < strlen($this->keyid); $i += 2) {
             $bytes .= chr(hexdec($this->keyid{$i}.$this->keyid{$i+1}));
         }
 

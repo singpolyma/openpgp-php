@@ -4,9 +4,11 @@ namespace OpenPGP\Packet\SignaturePacket\SubPacket;
 
 class NotationDataPacket extends Subpacket
 {
-    public $human_readable, $name;
+    public $human_readable;
+    public $name;
 
-    function read() {
+    public function read()
+    {
         $flags = $this->read_bytes(4);
         $namelen = $this->read_unpacked(2, 'n');
         $datalen = $this->read_unpacked(2, 'n');
@@ -15,7 +17,8 @@ class NotationDataPacket extends Subpacket
         $this->data = $this->read_bytes($datalen);
     }
 
-    function body () {
+    public function body()
+    {
         return chr($this->human_readable ? 0x80 : 0x00) . "\0\0\0" .
             pack('n', strlen($this->name)) . pack('n', strlen($this->data)) .
             $this->name . $this->data;

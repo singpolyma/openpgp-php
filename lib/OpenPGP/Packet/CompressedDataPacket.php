@@ -13,11 +13,12 @@ class CompressedDataPacket extends Packet implements \IteratorAggregate, \ArrayA
 {
     public $algorithm;
     /* see http://tools.ietf.org/html/rfc4880#section-9.3 */
-    static $algorithms = array(0 => 'Uncompressed', 1 => 'ZIP', 2 => 'ZLIB', 3 => 'BZip2');
-    function read() {
+    public static $algorithms = array(0 => 'Uncompressed', 1 => 'ZIP', 2 => 'ZLIB', 3 => 'BZip2');
+    public function read()
+    {
         $this->algorithm = ord($this->read_byte());
         $this->data = $this->read_bytes($this->length);
-        switch($this->algorithm) {
+        switch ($this->algorithm) {
             case 0:
                 $this->data = Message::parse($this->data);
                 break;
@@ -35,9 +36,10 @@ class CompressedDataPacket extends Packet implements \IteratorAggregate, \ArrayA
         }
     }
 
-    function body() {
+    public function body()
+    {
         $body = chr($this->algorithm);
-        switch($this->algorithm) {
+        switch ($this->algorithm) {
             case 0:
                 $body .= $this->data->to_bytes();
                 break;
@@ -58,25 +60,30 @@ class CompressedDataPacket extends Packet implements \IteratorAggregate, \ArrayA
 
     // IteratorAggregate interface
 
-    function getIterator() {
+    public function getIterator()
+    {
         return new \ArrayIterator($this->data->packets);
     }
 
     // ArrayAccess interface
 
-    function offsetExists($offset) {
+    public function offsetExists($offset)
+    {
         return isset($this->data[$offset]);
     }
 
-    function offsetGet($offset) {
+    public function offsetGet($offset)
+    {
         return $this->data[$offset];
     }
 
-    function offsetSet($offset, $value) {
+    public function offsetSet($offset, $value)
+    {
         return is_null($offset) ? $this->data[] = $value : $this->data[$offset] = $value;
     }
 
-    function offsetUnset($offset) {
+    public function offsetUnset($offset)
+    {
         unset($this->data[$offset]);
     }
 }

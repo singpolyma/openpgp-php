@@ -22,7 +22,8 @@ class OpenPGP
      * @see http://tools.ietf.org/html/rfc4880#section-6.2
      * @see http://tools.ietf.org/html/rfc2045
      */
-    static function enarmor($data, $marker = 'MESSAGE', array $headers = array()) {
+    public static function enarmor($data, $marker = 'MESSAGE', array $headers = array())
+    {
         $text = self::header($marker) . "\n";
         foreach ($headers as $key => $value) {
             $text .= $key . ': ' . (string)$value . "\n";
@@ -37,12 +38,13 @@ class OpenPGP
      * @see http://tools.ietf.org/html/rfc4880#section-6
      * @see http://tools.ietf.org/html/rfc2045
      */
-    static function unarmor($text, $header = 'PGP PUBLIC KEY BLOCK') {
+    public static function unarmor($text, $header = 'PGP PUBLIC KEY BLOCK')
+    {
         $header = self::header($header);
         $text = str_replace(array("\r\n", "\r"), array("\n", ''), $text);
-        if (($pos1 = strpos($text, $header)) !== FALSE &&
-            ($pos1 = strpos($text, "\n\n", $pos1 += strlen($header))) !== FALSE &&
-            ($pos2 = strpos($text, "\n=", $pos1 += 2)) !== FALSE) {
+        if (($pos1 = strpos($text, $header)) !== false &&
+            ($pos1 = strpos($text, "\n\n", $pos1 += strlen($header))) !== false &&
+            ($pos2 = strpos($text, "\n=", $pos1 += 2)) !== false) {
             return base64_decode($text = substr($text, $pos1, $pos2 - $pos1));
         }
     }
@@ -50,14 +52,16 @@ class OpenPGP
     /**
      * @see http://tools.ietf.org/html/rfc4880#section-6.2
      */
-    static function header($marker) {
+    public static function header($marker)
+    {
         return '-----BEGIN ' . strtoupper((string)$marker) . '-----';
     }
 
     /**
      * @see http://tools.ietf.org/html/rfc4880#section-6.2
      */
-    static function footer($marker) {
+    public static function footer($marker)
+    {
         return '-----END ' . strtoupper((string)$marker) . '-----';
     }
 
@@ -65,7 +69,8 @@ class OpenPGP
      * @see http://tools.ietf.org/html/rfc4880#section-6
      * @see http://tools.ietf.org/html/rfc4880#section-6.1
      */
-    static function crc24($data) {
+    public static function crc24($data)
+    {
         $crc = 0x00b704ce;
         for ($i = 0; $i < strlen($data); $i++) {
             $crc ^= (ord($data[$i]) & 255) << 16;
@@ -82,26 +87,31 @@ class OpenPGP
     /**
      * @see http://tools.ietf.org/html/rfc4880#section-12.2
      */
-    static function bitlength($data) {
+    public static function bitlength($data)
+    {
         return (strlen($data) - 1) * 8 + (int)floor(log(ord($data[0]), 2)) + 1;
     }
 
-    static function decode_s2k_count($c) {
+    public static function decode_s2k_count($c)
+    {
         return ((int)16 + ($c & 15)) << (($c >> 4) + 6);
     }
 
-    static function encode_s2k_count($iterations) {
-        if($iterations >= 65011712) return 255;
+    public static function encode_s2k_count($iterations)
+    {
+        if ($iterations >= 65011712) {
+            return 255;
+        }
 
         $count = $iterations >> 6;
         $c = 0;
-        while($count >= 32) {
+        while ($count >= 32) {
             $count = $count >> 1;
             $c++;
         }
         $result = ($c << 4) | ($count - 16);
 
-        if(OpenPGP::decode_s2k_count($result) < $iterations) {
+        if (OpenPGP::decode_s2k_count($result) < $iterations) {
             return $result + 1;
         }
 

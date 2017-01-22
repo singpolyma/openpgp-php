@@ -2,12 +2,15 @@
 
 namespace OpenPGP\Packet\SignaturePacket\SubPacket;
 
-class SignersUserIDPacket extends Subpacket {
-    function read() {
+class SignersUserIDPacket extends Subpacket
+{
+    public function read()
+    {
         $this->data = $this->input;
     }
 
-    function body() {
+    public function body()
+    {
         return $this->data;
     }
 }

@@ -2,12 +2,15 @@
 
 namespace OpenPGP\Packet\SignaturePacket\SubPacket;
 
-class PreferredKeyServerPacket extends Subpacket {
-    function read() {
+class PreferredKeyServerPacket extends Subpacket
+{
+    public function read()
+    {
         $this->data = $this->input;
     }
 
-    function body() {
+    public function body()
+    {
         return $this->data;
     }
 }

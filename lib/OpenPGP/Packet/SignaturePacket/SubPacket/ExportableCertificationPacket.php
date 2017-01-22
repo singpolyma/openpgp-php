@@ -2,12 +2,15 @@
 
 namespace OpenPGP\Packet\SignaturePacket\SubPacket;
 
-class ExportableCertificationPacket extends Subpacket {
-    function read() {
+class ExportableCertificationPacket extends Subpacket
+{
+    public function read()
+    {
         $this->data = (ord($this->input) != 0);
     }
 
-    function body() {
+    public function body()
+    {
         return chr($this->data ? 1 : 0);
     }
 }

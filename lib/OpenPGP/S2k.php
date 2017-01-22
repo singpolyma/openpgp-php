@@ -2,19 +2,25 @@
 
 namespace OpenPGP;
 
-class S2k {
-    public $type, $hash_algorithm, $salt, $count;
+class S2k
+{
+    public $type;
+    public $hash_algorithm;
+    public $salt;
+    public $count;
 
-    function __construct($salt='BADSALT', $hash_algorithm=10, $count=65536, $type=3) {
+    public function __construct($salt='BADSALT', $hash_algorithm=10, $count=65536, $type=3)
+    {
         $this->type = $type;
         $this->hash_algorithm = $hash_algorithm;
         $this->salt = $salt;
         $this->count = $count;
     }
 
-    static function parse(&$input) {
+    public static function parse(&$input)
+    {
         $s2k = new S2k();
-        switch($s2k->type = ord($input{0})) {
+        switch ($s2k->type = ord($input{0})) {
             case 0:
                 $s2k->hash_algorithm = ord($input{1});
                 $input = substr($input, 2);
@@ -35,9 +41,10 @@ class S2k {
         return $s2k;
     }
 
-    function to_bytes() {
+    public function to_bytes()
+    {
         $bytes = chr($this->type);
-        switch($this->type) {
+        switch ($this->type) {
             case 0:
                 $bytes .= chr($this->hash_algorithm);
                 break;
@@ -54,13 +61,15 @@ class S2k {
         return $bytes;
     }
 
-    function raw_hash($s) {
+    public function raw_hash($s)
+    {
         return hash(strtolower(OpenPGP_SignaturePacket::$hash_algorithms[$this->hash_algorithm]), $s, true);
     }
 
-    function sized_hash($s, $size) {
+    public function sized_hash($s, $size)
+    {
         $hash = $this->raw_hash($s);
-        while(strlen($hash) < $size) {
+        while (strlen($hash) < $size) {
             $s = "\0" . $s;
             $hash .= $this->raw_hash($s);
         }
@@ -68,14 +77,18 @@ class S2k {
         return substr($hash, 0, $size);
     }
 
-    function iterate($s) {
-        if(strlen($s) >= $this->count) return $s;
+    public function iterate($s)
+    {
+        if (strlen($s) >= $this->count) {
+            return $s;
+        }
         $s = str_repeat($s, ceil($this->count / strlen($s)));
         return substr($s, 0, $this->count);
     }
 
-    function make_key($pass, $size) {
-        switch($this->type) {
+    public function make_key($pass, $size)
+    {
+        switch ($this->type) {
             case 0:
                 return $this->sized_hash($pass, $size);
             case 1:

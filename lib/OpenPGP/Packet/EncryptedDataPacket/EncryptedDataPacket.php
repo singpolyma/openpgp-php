@@ -11,11 +11,13 @@ use OpenPGP\Packet\Packet;
  */
 class EncryptedDataPacket extends Packet
 {
-    function read() {
+    public function read()
+    {
         $this->data = $this->input;
     }
 
-    function body() {
+    public function body()
+    {
         return $this->data;
     }
 }

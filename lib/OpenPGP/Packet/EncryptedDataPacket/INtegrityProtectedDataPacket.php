@@ -11,18 +11,21 @@ class IntegrityProtectedDataPacket extends EncryptedDataPacket
 {
     public $version;
 
-    function __construct($data='', $version=1) {
+    public function __construct($data='', $version=1)
+    {
         parent::__construct();
         $this->version = $version;
         $this->data = $data;
     }
 
-    function read() {
+    public function read()
+    {
         $this->version = ord($this->read_byte());
         $this->data = $this->input;
     }
 
-    function body() {
+    public function body()
+    {
         return chr($this->version) . $this->data;
     }
 }

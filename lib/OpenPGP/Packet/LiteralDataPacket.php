@@ -9,9 +9,12 @@ namespace OpenPGP\Packet;
  */
 class LiteralDataPacket extends Packet
 {
-    public $format, $filename, $timestamp;
+    public $format;
+    public $filename;
+    public $timestamp;
 
-    function __construct($data=NULL, $opt=array()) {
+    public function __construct($data=null, $opt=array())
+    {
         parent::__construct();
         $this->data = $data;
         $this->format = isset($opt['format']) ? $opt['format'] : 'b';
@@ -19,22 +22,24 @@ class LiteralDataPacket extends Packet
         $this->timestamp = isset($opt['timestamp']) ? $opt['timestamp'] : time();
     }
 
-    function normalize($clearsign=false) {
-        if($clearsign && ($this->format != 'u' && $this->format != 't')) {
+    public function normalize($clearsign=false)
+    {
+        if ($clearsign && ($this->format != 'u' && $this->format != 't')) {
             $this->format = 'u'; // Clearsign must be text
         }
 
-        if($this->format == 'u' || $this->format == 't') { // Normalize line endings
+        if ($this->format == 'u' || $this->format == 't') { // Normalize line endings
             $this->data = str_replace("\n", "\r\n", str_replace("\r", "\n", str_replace("\r\n", "\n", $this->data)));
         }
 
-        if($clearsign) {
+        if ($clearsign) {
             // When clearsigning, do not sign over trailing whitespace
             $this->data = preg_replace('/\s+\r/', "\r", $this->data);
         }
     }
 
-    function read() {
+    public function read()
+    {
         $this->size = $this->length - 1 - 4;
         $this->format = $this->read_byte();
         $filename_length = ord($this->read_byte());
@@ -44,7 +49,8 @@ class LiteralDataPacket extends Packet
         $this->data = $this->read_bytes($this->size);
     }
 
-    function body() {
+    public function body()
+    {
         return $this->format.chr(strlen($this->filename)).$this->filename.pack('N', $this->timestamp).$this->data;
     }
 }

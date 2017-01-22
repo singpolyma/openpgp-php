@@ -2,15 +2,18 @@
 
 namespace OpenPGP\Packet\SignaturePacket\SubPacket;
 
-class ReasonforRevocationPacket extends Subpacket {
+class ReasonforRevocationPacket extends Subpacket
+{
     public $code;
 
-    function read() {
+    public function read()
+    {
         $this->code = ord($this->read_byte());
         $this->data = $this->input;
     }
 
-    function body() {
+    public function body()
+    {
         return chr($this->code) . $this->data;
     }
 }
