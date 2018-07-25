@@ -26,6 +26,6 @@ print $m->to_bytes();
 
 // Serialize public key message
 $pubm = clone($m);
-$pubm[0] = new OpenPGP_PublicKeyPacket($pubm[0]);
+$pubm[0] = new OpenPGP_PublicKeyPacket($pubm[0]->key);
 
 $public_bytes = $pubm->to_bytes();
