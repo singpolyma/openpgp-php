@@ -6,7 +6,7 @@ require_once dirname(__FILE__).'/../lib/openpgp.php';
 require_once dirname(__FILE__).'/../lib/openpgp_crypt_rsa.php';
 require_once dirname(__FILE__).'/../lib/openpgp_crypt_symmetric.php';
 
-class MessageVerification extends PHPUnit_Framework_TestCase {
+class MessageVerification extends PHPUnit\Framework\TestCase {
   public function oneMessageRSA($pkey, $path) {
     $pkeyM = OpenPGP_Message::parse(file_get_contents(dirname(__FILE__) . '/data/' . $pkey));
     $m = OpenPGP_Message::parse(file_get_contents(dirname(__FILE__) . '/data/' . $path));
@@ -51,7 +51,7 @@ class MessageVerification extends PHPUnit_Framework_TestCase {
 }
 
 
-class KeyVerification extends PHPUnit_Framework_TestCase {
+class KeyVerification extends PHPUnit\Framework\TestCase {
   public function oneKeyRSA($path) {
     $m = OpenPGP_Message::parse(file_get_contents(dirname(__FILE__) . '/data/' . $path));
     $verify = new OpenPGP_Crypt_RSA($m);
@@ -64,7 +64,7 @@ class KeyVerification extends PHPUnit_Framework_TestCase {
 }
 
 
-class Decryption extends PHPUnit_Framework_TestCase {
+class Decryption extends PHPUnit\Framework\TestCase {
   public function oneSymmetric($pass, $cnt, $path) {
     $m = OpenPGP_Message::parse(file_get_contents(dirname(__FILE__) . '/data/' . $path));
     $m2 = OpenPGP_Crypt_Symmetric::decryptSymmetric($pass, $m);
@@ -158,7 +158,7 @@ class Decryption extends PHPUnit_Framework_TestCase {
   }
 }
 
-class Encryption extends PHPUnit_Framework_TestCase {
+class Encryption extends PHPUnit\Framework\TestCase {
   public function oneSymmetric($algorithm) {
     $data = new OpenPGP_LiteralDataPacket('This is text.', array('format' => 'u', 'filename' => 'stuff.txt'));
     $encrypted = OpenPGP_Crypt_Symmetric::encrypt('secret', new OpenPGP_Message(array($data)), $algorithm);
