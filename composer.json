@@ -20,7 +20,7 @@
     "phpunit/phpunit": ">=5.0 <=8.0"
   },
   "suggest": {
-    "ext-mcrypt": "required if you use encryption cast5"
+    "ext-mcrypt": "required if you use encryption cast"
   },
   "autoload": {
     "classmap": ["lib/"]
