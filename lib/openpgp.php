@@ -557,7 +557,7 @@ class OpenPGP_Packet {
   }
 
   function read_byte() {
-    return ($bytes = $this->read_bytes()) ? $bytes[0] : NULL;
+    return !is_null($bytes = $this->read_bytes()) ? $bytes[0] : NULL;
   }
 
   function read_bytes($count = 1) {
