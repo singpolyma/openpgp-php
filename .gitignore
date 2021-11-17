@@ -2,3 +2,8 @@
 .tmp
 pkg
 tmp
+
+.phpunit.result.cache
+composer.lock
+.idea/
+vendor/

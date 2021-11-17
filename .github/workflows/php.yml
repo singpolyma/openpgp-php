@@ -1,0 +1,40 @@
+name: PHP Tests
+
+on: [ push, pull_request ]
+
+jobs:
+
+  build:
+    strategy:
+      matrix:
+        operating-system: [ ubuntu-latest ]
+        php-versions: [ '7.3', '7.4', '8.0', '8.1' ]
+        experimental: [ false ]
+        include:
+          - php-versions: '8.2'
+            operating-system: ubuntu-latest
+            experimental: true
+      fail-fast: false
+    runs-on: ${{ matrix.operating-system }}
+    continue-on-error: ${{ matrix.experimental }}
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php-versions }}
+
+      - name: Validate composer.json and composer.lock
+        run: composer validate
+
+      - name: Install dependencies
+        if: "${{ matrix.experimental == false }}"
+        run: composer install --prefer-dist --no-progress --no-suggest
+
+      - name: Install dependencies, ignore php requirements
+        if: "${{ matrix.experimental == true }}"
+        run: composer install --prefer-dist --no-progress --no-suggest --ignore-platform-reqs
+
+      - name: Run test suite
+        run: composer run-script test
