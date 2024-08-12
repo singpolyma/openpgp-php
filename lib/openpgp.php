@@ -882,10 +882,16 @@ class OpenPGP_SignaturePacket extends OpenPGP_Packet {
     }
     $input = substr($input, $length_of_length); // Chop off length header
     $tag = ord($input[0]);
+    // Is the subpacket critical?
+    $criticalFlagMask = 0x80;
+    $typeMask = 0x7F;
+    $isCritical = ($tag & $criticalFlagMask) === $criticalFlagMask;
+    $tag = $tag & $typeMask;
     $class = self::class_for($tag);
     if($class) {
       $packet = new $class();
       $packet->tag = $tag;
+      $packet->isCritical = $isCritical;
       $packet->input = substr($input, 1, $len-1);
       $packet->length = $len-1;
       $packet->read();
@@ -951,6 +957,8 @@ class OpenPGP_SignaturePacket extends OpenPGP_Packet {
 
 class OpenPGP_SignaturePacket_Subpacket extends OpenPGP_Packet {
   public $input;
+
+  public $isCritical = false;
 
   public $length;
 
@@ -1933,7 +1941,7 @@ class OpenPGP_UserAttributePacket extends OpenPGP_Packet {
   public $packets;
 
   public $input;
-  
+
   public $length;
 
   // TODO
