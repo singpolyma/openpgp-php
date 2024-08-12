@@ -705,8 +705,9 @@ class OpenPGP_SignaturePacket extends OpenPGP_Packet {
   function sign_data($signers) {
     $this->trailer = $this->calculate_trailer();
     $signer = $signers[$this->key_algorithm_name()][$this->hash_algorithm_name()];
-    $this->data = call_user_func($signer, $this->data.$this->trailer);
-    $unpacked = unpack('n', substr(implode('',$this->data), 0, 2));
+    $signed = call_user_func($signer, $this->data.$this->trailer);
+    $this->data = array($signed["signed"]);
+    $unpacked = unpack('n', substr($signed["hash"], 0, 2));
     $this->hash_head = reset($unpacked);
   }
 
