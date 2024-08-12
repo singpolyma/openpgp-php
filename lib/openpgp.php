@@ -5,7 +5,7 @@
  * (RFC 4880).
  *
  * @package OpenPGP
- * @version 0.6.0
+ * @version 0.7.0
  * @author  Arto Bendiken <arto.bendiken@gmail.com>
  * @author  Stephen Paul Weber <singpolyma@singpolyma.net>
  * @see     http://github.com/bendiken/openpgp-php
@@ -18,7 +18,7 @@
  * @see http://tools.ietf.org/html/rfc4880
  */
 class OpenPGP {
-  const VERSION = array(0, 6, 0);
+  const VERSION = array(0, 7, 0);
 
   /**
    * @see http://tools.ietf.org/html/rfc4880#section-6
