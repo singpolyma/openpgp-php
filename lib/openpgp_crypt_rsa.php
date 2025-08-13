@@ -222,6 +222,8 @@ class OpenPGP_Crypt_RSA {
         $data = $key->decrypt($edata);
     } catch (\RuntimeException $e) {
         return NULL;
+    } catch (\OutOfRangeException $e) {
+        return NULL;
     }
 
     if(!$data) return NULL;
