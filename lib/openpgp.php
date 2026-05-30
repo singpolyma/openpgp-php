@@ -187,9 +187,9 @@ class OpenPGP_S2K {
   }
 
   function iterate($s) {
-    if(strlen($s) >= $this->count) return $s;
-    $s = str_repeat($s, ceil($this->count / strlen($s)));
-    return substr($s, 0, $this->count);
+    $sLen = strlen($s);
+    if($sLen >= $this->count) return $s;
+    return str_repeat($s, floor($this->count / $sLen)) . substr($s, 0, $this->count % $sLen);
   }
 
   function make_key($pass, $size) {
