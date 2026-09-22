@@ -1,10 +1,9 @@
 <?php
 
-use phpseclib3\Crypt\AES as Crypt_AES;
-use phpseclib3\Crypt\Blowfish as Crypt_Blowfish;
-use phpseclib3\Crypt\TripleDES as Crypt_TripleDES;
-use phpseclib3\Crypt\Twofish as Crypt_Twofish;
-use phpseclib3\Crypt\Random;
+use phpseclib4\Crypt\AES as Crypt_AES;
+use phpseclib4\Crypt\Blowfish as Crypt_Blowfish;
+use phpseclib4\Crypt\TripleDES as Crypt_TripleDES;
+use phpseclib4\Crypt\Twofish as Crypt_Twofish;
 
 require_once dirname(__FILE__).'/openpgp.php';
 @include_once dirname(__FILE__).'/openpgp_crypt_rsa.php';
@@ -15,10 +14,10 @@ class OpenPGP_Crypt_Symmetric {
   public static function encrypt($passphrases_and_keys, $message, $symmetric_algorithm=9) {
     list($cipher, $key_bytes, $key_block_bytes) = self::getCipher($symmetric_algorithm);
     if(!$cipher) throw new Exception("Unsupported cipher");
-    $prefix = Random::string($key_block_bytes);
+    $prefix = OpenPGP_Random::string($key_block_bytes);
     $prefix .= substr($prefix, -2);
 
-    $key = Random::string($key_bytes);
+    $key = OpenPGP_Random::string($key_bytes);
     $cipher->setKey($key);
 
     $to_encrypt = $prefix . $message->to_bytes();
@@ -39,7 +38,7 @@ class OpenPGP_Crypt_Symmetric {
         $esk = pack('n', OpenPGP::bitlength($esk)) . $esk;
         array_unshift($encrypted, new OpenPGP_AsymmetricSessionKeyPacket($pass->algorithm, $pass->fingerprint(), $esk));
       } else if(is_string($pass)) {
-        $s2k = new OpenPGP_S2K(Random::string(8));
+        $s2k = new OpenPGP_S2K(OpenPGP_Random::string(8));
         $cipher->setKey($s2k->make_key($pass, $key_bytes));
         $esk = $cipher->encrypt(chr($symmetric_algorithm) . $key);
         array_unshift($encrypted, new OpenPGP_SymmetricSessionKeyPacket($s2k, $esk, $symmetric_algorithm));
@@ -90,8 +89,8 @@ class OpenPGP_Crypt_Symmetric {
     }
     $material .= hash('sha1', $material, true);
 
-    $iv = Random::string($key_block_bytes);
-    if(!$packet->s2k) $packet->s2k = new OpenPGP_S2K(Random::string(8));
+    $iv = OpenPGP_Random::string($key_block_bytes);
+    if(!$packet->s2k) $packet->s2k = new OpenPGP_S2K(OpenPGP_Random::string(8));
     $cipher->setKey($packet->s2k->make_key($pass, $key_bytes));
     $cipher->setIV($iv);
     $packet->encrypted_data = $iv . $cipher->encrypt($material);

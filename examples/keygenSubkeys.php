@@ -1,7 +1,7 @@
 <?php
 
-use phpseclib3\Crypt\RSA;
-use phpseclib3\Crypt\RSA\Formats\Keys\PKCS1;
+use phpseclib4\Crypt\RSA;
+use phpseclib4\Crypt\RSA\Formats\Keys\PKCS1;
 
 @include_once dirname(__FILE__).'/../vendor/autoload.php';
 require_once dirname(__FILE__).'/../lib/openpgp.php';
