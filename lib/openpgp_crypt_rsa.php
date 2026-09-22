@@ -7,10 +7,9 @@
  */
 
 // From http://phpseclib.sourceforge.net/
-use phpseclib3\Crypt\PublicKeyLoader;
-use phpseclib3\Crypt\RSA as Crypt_RSA;
-use phpseclib3\Crypt\RSA\PublicKey;
-use phpseclib3\Math\BigInteger as Math_BigInteger;
+use phpseclib4\Crypt\PublicKeyLoader;
+use phpseclib4\Crypt\RSA as Crypt_RSA;
+use phpseclib4\Math\BigInteger as Math_BigInteger;
 
 define('CRYPT_RSA_ENCRYPTION_PKCS1', Crypt_RSA::ENCRYPTION_PKCS1);
 define('CRYPT_RSA_SIGNATURE_PKCS1', Crypt_RSA::SIGNATURE_PKCS1);

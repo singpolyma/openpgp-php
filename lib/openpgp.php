@@ -1287,7 +1287,9 @@ class OpenPGP_SignaturePacket_SignatureTargetPacket extends OpenPGP_SignaturePac
 }
 
 class OpenPGP_SignaturePacket_EmbeddedSignaturePacket extends OpenPGP_SignaturePacket {
-  // TODO: This is duplicated from subpacket... improve?
+  public $isCritical = false;
+
+    // TODO: This is duplicated from subpacket... improve?
   function __construct($data=NULL) {
     parent::__construct($data);
     $this->tag = array_search(substr(substr(get_class($this), 8+16), 0, -6), OpenPGP_SignaturePacket::$subpacket_types);
@@ -2008,3 +2010,22 @@ class OpenPGP_ModificationDetectionCodePacket extends OpenPGP_Packet {
  * @see http://tools.ietf.org/html/rfc4880#section-4.3
  */
 class OpenPGP_ExperimentalPacket extends OpenPGP_Packet {}
+
+/**
+ * Utility for generating cryptographically secure random bytes. Uses internal PHP implementation when available
+ * (PHP >= 7.0)
+ */
+class OpenPGP_Random {
+  /**
+   * @param int $length
+   * @return string
+   * @throws \Random\RandomException
+   */
+  public static function string($length) {
+    if (PHP_VERSION_ID >= 70000) {
+      return random_bytes($length);
+    }
+
+    return phpseclib3\Crypt\Random::string($length);
+  }
+}
